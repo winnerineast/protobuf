@@ -20,7 +20,11 @@ require_once('generated/Foo/TestMessage_NestedEnum.php');
 require_once('generated/Foo/TestMessage_Sub.php');
 require_once('generated/Foo/TestPackedMessage.php');
 require_once('generated/Foo/TestPhpDoc.php');
+require_once('generated/Foo/TestRandomFieldOrder.php');
+require_once('generated/Foo/TestReverseFieldOrder.php');
 require_once('generated/Foo/TestUnpackedMessage.php');
+require_once('generated/Foo/testLowerCaseMessage.php');
+require_once('generated/Foo/testLowerCaseEnum.php');
 require_once('generated/GPBMetadata/Proto/Test.php');
 require_once('generated/GPBMetadata/Proto/TestEmptyPhpNamespace.php');
 require_once('generated/GPBMetadata/Proto/TestInclude.php');
@@ -49,7 +53,7 @@ TestUtil::assertTestMessage($to);
 $from->setRecursive($from);
 
 $arr = new RepeatedField(GPBType::MESSAGE, TestMessage::class);
-$arr []= new TestMessage;
+$arr[] = new TestMessage;
 $arr[0]->SetRepeatedRecursive($arr);
 
 // Test oneof fields.

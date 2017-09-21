@@ -38,15 +38,23 @@ use Google\Protobuf\Internal\MapField;
 
 class GPBUtil
 {
-    public function divideInt64ToInt32($value, &$high, &$low, $trim = false)
+    const NANOS_PER_MILLISECOND = 1000000;
+    const NANOS_PER_MICROSECOND = 1000;
+
+    public static function divideInt64ToInt32($value, &$high, &$low, $trim = false)
     {
         $isNeg = (bccomp($value, 0) < 0);
         if ($isNeg) {
             $value = bcsub(0, $value);
         }
 
-        $high = (int) bcdiv(bcadd($value, 1), 4294967296);
+        $high = bcdiv($value, 4294967296);
         $low = bcmod($value, 4294967296);
+        if (bccomp($high, 2147483647) > 0) {
+            $high = (int) bcsub($high, 4294967296);
+        } else {
+            $high = (int) $high;
+        }
         if (bccomp($low, 2147483647) > 0) {
             $low = (int) bcsub($low, 4294967296);
         } else {
@@ -58,7 +66,7 @@ class GPBUtil
             $low = ~$low;
             $low++;
             if (!$low) {
-                $high++;
+                $high = (int)($high + 1);
             }
         }
 
@@ -70,15 +78,13 @@ class GPBUtil
     public static function checkString(&$var, $check_utf8)
     {
         if (is_array($var) || is_object($var)) {
-            trigger_error("Expect string.", E_USER_ERROR);
-            return;
+            throw new \InvalidArgumentException("Expect string.");
         }
         if (!is_string($var)) {
             $var = strval($var);
         }
         if ($check_utf8 && !preg_match('//u', $var)) {
-            trigger_error("Expect utf-8 encoding.", E_USER_ERROR);
-            return;
+            throw new \Exception("Expect utf-8 encoding.");
         }
     }
 
@@ -92,7 +98,7 @@ class GPBUtil
         if (is_numeric($var)) {
             $var = intval($var);
         } else {
-            trigger_error("Expect integer.", E_USER_ERROR);
+            throw new \Exception("Expect integer.");
         }
     }
 
@@ -109,7 +115,7 @@ class GPBUtil
                 $var = (int) $var;
             }
         } else {
-            trigger_error("Expect integer.", E_USER_ERROR);
+            throw new \Exception("Expect integer.");
         }
     }
 
@@ -119,10 +125,15 @@ class GPBUtil
             if (PHP_INT_SIZE == 8) {
                 $var = intval($var);
             } else {
-                $var = bcdiv($var, 1, 0);
+                if (is_float($var) ||
+                    is_integer($var) ||
+                    (is_string($var) &&
+                         bccomp($var, "9223372036854774784") < 0)) {
+                    $var = number_format($var, 0, ".", "");
+                }
             }
         } else {
-            trigger_error("Expect integer.", E_USER_ERROR);
+            throw new \Exception("Expect integer.");
         }
     }
 
@@ -132,10 +143,10 @@ class GPBUtil
             if (PHP_INT_SIZE == 8) {
                 $var = intval($var);
             } else {
-                $var = bcdiv($var, 1, 0);
+                $var = number_format($var, 0, ".", "");
             }
         } else {
-            trigger_error("Expect integer.", E_USER_ERROR);
+            throw new \Exception("Expect integer.");
         }
     }
 
@@ -144,7 +155,7 @@ class GPBUtil
         if (is_float($var) || is_numeric($var)) {
             $var = floatval($var);
         } else {
-            trigger_error("Expect float.", E_USER_ERROR);
+            throw new \Exception("Expect float.");
         }
     }
 
@@ -153,15 +164,14 @@ class GPBUtil
         if (is_float($var) || is_numeric($var)) {
             $var = floatval($var);
         } else {
-            trigger_error("Expect float.", E_USER_ERROR);
+            throw new \Exception("Expect float.");
         }
     }
 
     public static function checkBool(&$var)
     {
         if (is_array($var) || is_object($var)) {
-            trigger_error("Expect boolean.", E_USER_ERROR);
-            return;
+            throw new \Exception("Expect boolean.");
         }
         $var = boolval($var);
     }
@@ -169,14 +179,14 @@ class GPBUtil
     public static function checkMessage(&$var, $klass)
     {
         if (!$var instanceof $klass && !is_null($var)) {
-            trigger_error("Expect message.", E_USER_ERROR);
+            throw new \Exception("Expect message.");
         }
     }
 
     public static function checkRepeatedField(&$var, $type, $klass = null)
     {
         if (!$var instanceof RepeatedField && !is_array($var)) {
-            trigger_error("Expect array.", E_USER_ERROR);
+            throw new \Exception("Expect array.");
         }
         if (is_array($var)) {
             $tmp = new RepeatedField($type, $klass);
@@ -186,15 +196,13 @@ class GPBUtil
             return $tmp;
         } else {
             if ($var->getType() != $type) {
-                trigger_error(
-                    "Expect repeated field of different type.",
-                    E_USER_ERROR);
+                throw new \Exception(
+                    "Expect repeated field of different type.");
             }
             if ($var->getType() === GPBType::MESSAGE &&
                 $var->getClass() !== $klass) {
-                trigger_error(
-                    "Expect repeated field of different message.",
-                    E_USER_ERROR);
+                throw new \Exception(
+                    "Expect repeated field of different message.");
             }
             return $var;
         }
@@ -203,7 +211,7 @@ class GPBUtil
     public static function checkMapField(&$var, $key_type, $value_type, $klass = null)
     {
         if (!$var instanceof MapField && !is_array($var)) {
-            trigger_error("Expect dict.", E_USER_ERROR);
+            throw new \Exception("Expect dict.");
         }
         if (is_array($var)) {
             $tmp = new MapField($key_type, $value_type, $klass);
@@ -213,20 +221,15 @@ class GPBUtil
             return $tmp;
         } else {
             if ($var->getKeyType() != $key_type) {
-                trigger_error(
-                    "Expect map field of key type.",
-                    E_USER_ERROR);
+                throw new \Exception("Expect map field of key type.");
             }
             if ($var->getValueType() != $value_type) {
-                trigger_error(
-                    "Expect map field of value type.",
-                    E_USER_ERROR);
+                throw new \Exception("Expect map field of value type.");
             }
             if ($var->getValueType() === GPBType::MESSAGE &&
                 $var->getValueClass() !== $klass) {
-                trigger_error(
-                    "Expect map field of different value message.",
-                    E_USER_ERROR);
+                throw new \Exception(
+                    "Expect map field of different value message.");
             }
             return $var;
         }
@@ -270,7 +273,7 @@ class GPBUtil
         $name,
         $file_proto)
     {
-        $classname = implode('_', array_map('ucwords', explode('.', $name)));
+        $classname = implode('_', explode('.', $name));
         return static::getClassNamePrefix($classname, $file_proto) . $classname;
     }
 
@@ -328,7 +331,7 @@ class GPBUtil
             $low = ~$low;
             $low++;
             if (!$low) {
-                $high++;
+                $high = (int) ($high + 1);
             }
         }
         $result = bcadd(bcmul($high, 4294967296), $low);
@@ -339,5 +342,82 @@ class GPBUtil
           $result = bcsub(0, $result);
         }
         return $result;
+    }
+    
+    public static function parseTimestamp($timestamp)
+    {
+        // prevent parsing timestamps containing with the non-existant year "0000"
+        // DateTime::createFromFormat parses without failing but as a nonsensical date
+        if (substr($timestamp, 0, 4) === "0000") {
+            throw new \Exception("Year cannot be zero.");
+        }
+        // prevent parsing timestamps ending with a lowercase z
+        if (substr($timestamp, -1, 1) === "z") {
+            throw new \Exception("Timezone cannot be a lowercase z.");
+        }
+        
+        $nanoseconds = 0;
+        $periodIndex = strpos($timestamp, ".");
+        if ($periodIndex !== false) {
+            $nanosecondsLength = 0;
+            // find the next non-numeric character in the timestamp to calculate
+            // the length of the nanoseconds text
+            for ($i = $periodIndex + 1, $length = strlen($timestamp); $i < $length; $i++) {
+                if (!is_numeric($timestamp[$i])) {
+                    $nanosecondsLength = $i - ($periodIndex + 1);
+                    break;
+                }
+            }
+            if ($nanosecondsLength % 3 !== 0) {
+                throw new \Exception("Nanoseconds must be disible by 3.");
+            }
+            if ($nanosecondsLength > 9) {
+                throw new \Exception("Nanoseconds must be in the range of 0 to 999,999,999 nanoseconds.");
+            }
+            if ($nanosecondsLength > 0) {
+                $nanoseconds = substr($timestamp, $periodIndex + 1, $nanosecondsLength);
+                $nanoseconds = intval($nanoseconds);
+
+                // remove the nanoseconds and preceding period from the timestamp
+                $date = substr($timestamp, 0, $periodIndex - 1);
+                $timezone = substr($timestamp, $periodIndex + $nanosecondsLength);
+                $timestamp = $date.$timezone;
+            }
+        }
+
+        $date = \DateTime::createFromFormat(\DateTime::RFC3339, $timestamp, new \DateTimeZone("UTC"));
+        if ($date === false) {
+            throw new \Exception("Invalid RFC 3339 timestamp.");
+        }
+
+        $value = new \Google\Protobuf\Timestamp();
+        $seconds = $date->format("U");
+        $value->setSeconds($seconds);
+        $value->setNanos($nanoseconds);
+        return $value;
+    }
+    
+    public static function formatTimestamp($value)
+    {
+        $nanoseconds = static::getNanosecondsForTimestamp($value->getNanos());
+        if (!empty($nanoseconds)) {
+            $nanoseconds = ".".$nanoseconds;
+        }
+        $date = new \DateTime('@'.$value->getSeconds(), new \DateTimeZone("UTC"));
+        return $date->format("Y-m-d\TH:i:s".$nanoseconds."\Z");
+    }
+
+    public static function getNanosecondsForTimestamp($nanoseconds)
+    {
+        if ($nanoseconds == 0) {
+            return '';
+        }
+        if ($nanoseconds % static::NANOS_PER_MILLISECOND == 0) {
+            return sprintf('%03d', $nanoseconds / static::NANOS_PER_MILLISECOND);
+        }
+        if ($nanoseconds % static::NANOS_PER_MICROSECOND == 0) {
+            return sprintf('%06d', $nanoseconds / static::NANOS_PER_MICROSECOND);
+        }
+        return sprintf('%09d', $nanoseconds);
     }
 }

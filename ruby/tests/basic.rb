@@ -96,8 +96,18 @@ module BasicTest
         optional :d, :enum, 4, "TestEnum"
       end
     end
+
+    add_message "repro.Outer" do
+      map :items, :int32, :message, 1, "repro.Inner"
+    end
+
+    add_message "repro.Inner" do
+    end
   end
 
+
+  Outer = pool.lookup("repro.Outer").msgclass
+  Inner = pool.lookup("repro.Inner").msgclass
   Foo = pool.lookup("Foo").msgclass
   Bar = pool.lookup("Bar").msgclass
   Baz = pool.lookup("Baz").msgclass
@@ -675,6 +685,21 @@ module BasicTest
       m.map_string_int32['aaa'] = 3
     end
 
+    def test_concurrent_decoding
+      o = Outer.new
+      o.items[0] = Inner.new
+      raw = Outer.encode(o)
+
+      thds = 2.times.map do
+        Thread.new do
+          100000.times do
+            assert_equal o, Outer.decode(raw)
+          end
+        end
+      end
+      thds.map(&:join)
+    end
+
     def test_map_encode_decode
       m = MapMessage.new(
         :map_string_int32 => {"a" => 1, "b" => 2},
@@ -902,7 +927,7 @@ module BasicTest
     end
 
     def test_to_h
-      m = TestMessage.new(:optional_bool => true, :optional_double => -10.100001, :optional_string => 'foo', :repeated_string => ['bar1', 'bar2'])
+      m = TestMessage.new(:optional_bool => true, :optional_double => -10.100001, :optional_string => 'foo', :repeated_string => ['bar1', 'bar2'], :repeated_msg => [TestMessage2.new(:foo => 100)])
       expected_result = {
         :optional_bool=>true,
         :optional_bytes=>"",
@@ -922,7 +947,7 @@ module BasicTest
         :repeated_float=>[],
         :repeated_int32=>[],
         :repeated_int64=>[],
-        :repeated_msg=>[],
+        :repeated_msg=>[{:foo => 100}],
         :repeated_string=>["bar1", "bar2"],
         :repeated_uint32=>[],
         :repeated_uint64=>[]
