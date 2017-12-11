@@ -363,9 +363,6 @@ void MessageDifferencer::TreatAsMapUsingKeyComparator(
     const MapKeyComparator* key_comparator) {
   GOOGLE_CHECK(field->is_repeated()) << "Field must be repeated: "
                                << field->full_name();
-  GOOGLE_CHECK_EQ(FieldDescriptor::CPPTYPE_MESSAGE, field->cpp_type())
-      << "Field has to be message type.  Field name is: "
-      << field->full_name();
   GOOGLE_CHECK(set_fields_.find(field) == set_fields_.end())
       << "Cannot treat this repeated field as both Map and Set for "
       << "comparison.";
@@ -1440,9 +1437,6 @@ bool MessageDifferencer::MatchRepeatedFieldIndices(
   match_list1->assign(count1, -1);
   match_list2->assign(count2, -1);
 
-  SpecificField specific_field;
-  specific_field.field = repeated_field;
-
   bool success = true;
   // Find potential match if this is a special repeated field.
   if (key_comparator != NULL || IsTreatedAsSet(repeated_field)) {
@@ -1469,20 +1463,15 @@ bool MessageDifferencer::MatchRepeatedFieldIndices(
         // Indicates any matched elements for this repeated field.
         bool match = false;
 
-        specific_field.index = i;
-        specific_field.new_index = i;
-
         for (int j = 0; j < count2; j++) {
           if (match_list2->at(j) != -1) continue;
-          specific_field.index = i;
-          specific_field.new_index = j;
 
           match = IsMatch(repeated_field, key_comparator,
                           &message1, &message2, parent_fields, i, j);
 
           if (match) {
-            match_list1->at(specific_field.index) = specific_field.new_index;
-            match_list2->at(specific_field.new_index) = specific_field.index;
+            match_list1->at(i) = j;
+            match_list2->at(j) = i;
             break;
           }
         }
@@ -1758,6 +1747,13 @@ void MessageDifferencer::StreamReporter::ReportUnknownFieldIgnored(
   }
   printer_->Print("\n");  // Print for newlines.
 }
+
+MessageDifferencer::MapKeyComparator*
+MessageDifferencer::CreateMultipleFieldsMapKeyComparator(
+    const std::vector<std::vector<const FieldDescriptor*> >& key_field_paths) {
+  return new MultipleFieldsMapKeyComparator(this, key_field_paths);
+}
+
 
 }  // namespace util
 }  // namespace protobuf

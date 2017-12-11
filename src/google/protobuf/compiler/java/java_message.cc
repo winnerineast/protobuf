@@ -371,6 +371,7 @@ void ImmutableMessageGenerator::Generate(io::Printer* printer) {
     "}\n"
     "\n");
 
+
   printer->Print(
     "@java.lang.Override\n"
     "public final com.google.protobuf.UnknownFieldSet\n"
@@ -1258,19 +1259,9 @@ GenerateParsingConstructor(io::Printer* printer) {
   printer->Indent();
 
   printer->Print(
-    "case 0:\n"  // zero signals EOF / limit reached
-    "  done = true;\n"
-    "  break;\n"
-    "default: {\n"
-    "  if (!parseUnknownField$suffix$(\n"
-    "      input, unknownFields, extensionRegistry, tag)) {\n"
-    "    done = true;\n"  // it's an endgroup tag
-    "  }\n"
-    "  break;\n"
-    "}\n",
-    "suffix",
-    descriptor_->file()->syntax() == FileDescriptor::SYNTAX_PROTO3 ? "Proto3"
-                                                                   : "");
+      "case 0:\n"  // zero signals EOF / limit reached
+      "  done = true;\n"
+      "  break;\n");
 
   for (int i = 0; i < descriptor_->field_count(); i++) {
     const FieldDescriptor* field = sorted_fields[i];
@@ -1307,6 +1298,18 @@ GenerateParsingConstructor(io::Printer* printer) {
         "}\n");
     }
   }
+
+  printer->Print(
+      "default: {\n"
+      "  if (!parseUnknownField$suffix$(\n"
+      "      input, unknownFields, extensionRegistry, tag)) {\n"
+      "    done = true;\n"  // it's an endgroup tag
+      "  }\n"
+      "  break;\n"
+      "}\n",
+      "suffix",
+      descriptor_->file()->syntax() == FileDescriptor::SYNTAX_PROTO3 ? "Proto3"
+                                                                     : "");
 
   printer->Outdent();
   printer->Outdent();

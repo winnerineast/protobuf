@@ -14,6 +14,10 @@
 #include <google/protobuf/generated_message_reflection.h>
 #include <google/protobuf/reflection_ops.h>
 #include <google/protobuf/wire_format.h>
+// This is a temporary google only hack
+#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+#include "third_party/protobuf/version.h"
+#endif
 // @@protoc_insertion_point(includes)
 namespace google {
 namespace protobuf {
@@ -28,7 +32,11 @@ namespace protobuf_google_2fprotobuf_2fduration_2eproto {
 void InitDefaultsDurationImpl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
+#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
+#else
   ::google::protobuf::internal::InitProtobufDefaults();
+#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
   {
     void* ptr = &::google::protobuf::_Duration_default_instance_;
     new (ptr) ::google::protobuf::Duration();
@@ -159,12 +167,7 @@ Duration::~Duration() {
 }
 
 void Duration::SharedDtor() {
-  ::google::protobuf::Arena* arena = GetArenaNoVirtual();
-  GOOGLE_DCHECK(arena == NULL);
-  if (arena != NULL) {
-    return;
-  }
-
+  GOOGLE_DCHECK(GetArenaNoVirtual() == NULL);
 }
 
 void Duration::ArenaDtor(void* object) {
@@ -188,9 +191,6 @@ const Duration& Duration::default_instance() {
   return *internal_default_instance();
 }
 
-Duration* Duration::New(::google::protobuf::Arena* arena) const {
-  return ::google::protobuf::Arena::CreateMessage<Duration>(arena);
-}
 
 void Duration::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.Duration)
@@ -422,6 +422,13 @@ void Duration::InternalSwap(Duration* other) {
 
 
 // @@protoc_insertion_point(namespace_scope)
+}  // namespace protobuf
+}  // namespace google
+namespace google {
+namespace protobuf {
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::google::protobuf::Duration* Arena::CreateMessage< ::google::protobuf::Duration >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::google::protobuf::Duration >(arena);
+}
 }  // namespace protobuf
 }  // namespace google
 

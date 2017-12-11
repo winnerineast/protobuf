@@ -305,6 +305,15 @@ inline bool SupportsArenas(const FieldDescriptor* field) {
   return SupportsArenas(field->file());
 }
 
+inline bool IsCrossFileMessage(const FieldDescriptor* field) {
+  return field->type() == FieldDescriptor::TYPE_MESSAGE &&
+         field->message_type()->file() != field->file();
+}
+
+inline string MessageCreateFunction(const Descriptor* d) {
+  return SupportsArenas(d) ? "CreateMessage" : "Create";
+}
+
 bool IsAnyMessage(const FileDescriptor* descriptor);
 bool IsAnyMessage(const Descriptor* descriptor);
 

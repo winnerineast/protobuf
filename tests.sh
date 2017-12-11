@@ -47,7 +47,7 @@ build_cpp() {
     git submodule init
     git submodule update
     cd third_party/benchmark && cmake -DCMAKE_BUILD_TYPE=Release && make && cd ../..
-    cd benchmarks && make && ./generate-datasets && cd ..
+    cd benchmarks && make cpp-benchmark && cd ..
   else
     echo ""
     echo "WARNING: Skipping validation of the bench marking code, cmake isn't installed."
@@ -61,9 +61,8 @@ build_cpp_distcheck() {
   make dist
 
   # List all files that should be included in the distribution package.
-  git ls-files | grep "^\(java\|python\|objectivec\|csharp\|js\|ruby\|php\|cmake\|examples\)" |\
+  git ls-files | grep "^\(java\|python\|objectivec\|csharp\|js\|ruby\|php\|cmake\|examples\|src/google/protobuf/.*\.proto\)" |\
     grep -v ".gitignore" | grep -v "java/compatibility_tests" |\
-    grep -v "cmake/protobuf.*\.pc\.cmake" |\
     grep -v "python/compatibility_tests" | grep -v "csharp/compatibility_tests" > dist.lst
   # Unzip the dist tar file.
   DIST=`ls *.tar.gz`
@@ -88,9 +87,7 @@ build_cpp_distcheck() {
 }
 
 build_csharp() {
-  # Just for the conformance tests. We don't currently
-  # need to really build protoc, but it's simplest to keep with the
-  # conventions of the other builds.
+  # Required for conformance tests and to regenerate protos.
   internal_build_cpp
   NUGET=/usr/local/bin/nuget.exe
 
@@ -105,6 +102,10 @@ build_csharp() {
   (cd dotnettmp; dotnet new > /dev/null)
   rm -rf dotnettmp
 
+  # Check that the protos haven't broken C# codegen.
+  # TODO(jonskeet): Fail if regenerating creates any changes.
+  csharp/generate_protos.sh
+  
   csharp/buildall.sh
   cd conformance && make test_csharp && cd ..
 
@@ -347,18 +348,25 @@ generate_php_test_proto() {
   # Generate test file
   rm -rf generated
   mkdir generated
-  ../../src/protoc --php_out=generated   \
-    proto/test.proto                     \
-    proto/test_include.proto             \
-    proto/test_no_namespace.proto        \
-    proto/test_prefix.proto              \
-    proto/test_php_namespace.proto       \
-    proto/test_empty_php_namespace.proto \
-    proto/test_service.proto             \
-    proto/test_service_namespace.proto   \
+  ../../src/protoc --php_out=generated         \
+    proto/test.proto                           \
+    proto/test_include.proto                   \
+    proto/test_no_namespace.proto              \
+    proto/test_prefix.proto                    \
+    proto/test_php_namespace.proto             \
+    proto/test_empty_php_namespace.proto       \
+    proto/test_reserved_enum_lower.proto       \
+    proto/test_reserved_enum_upper.proto       \
+    proto/test_reserved_enum_value_lower.proto \
+    proto/test_reserved_enum_value_upper.proto \
+    proto/test_reserved_message_lower.proto    \
+    proto/test_reserved_message_upper.proto    \
+    proto/test_service.proto                   \
+    proto/test_service_namespace.proto         \
     proto/test_descriptors.proto
   pushd ../../src
-  ./protoc --php_out=../php/tests/generated -I../php/tests -I. ../php/tests/proto/test_import_descriptor_proto.proto
+  ./protoc --php_out=../php/tests/generated -I../php/tests -I. \
+    ../php/tests/proto/test_import_descriptor_proto.proto
   popd
   popd
 }

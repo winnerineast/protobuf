@@ -24,6 +24,8 @@ COPTS = select({
         "-Woverloaded-virtual",
         "-Wno-sign-compare",
         "-Wno-unused-function",
+        # Prevents ISO C++ const string assignment warnings for pyext sources.
+        "-Wno-writable-strings",
     ],
 })
 
@@ -61,37 +63,6 @@ load(
     "internal_protobuf_py_tests",
 )
 
-config_setting(
-    name = "ios_armv7",
-    values = {
-        "ios_cpu": "armv7",
-    },
-)
-
-config_setting(
-    name = "ios_armv7s",
-    values = {
-        "ios_cpu": "armv7s",
-    },
-)
-
-config_setting(
-    name = "ios_arm64",
-    values = {
-        "ios_cpu": "arm64",
-    },
-)
-
-IOS_ARM_COPTS = [
-    "-DOS_IOS",
-    "-miphoneos-version-min=7.0",
-    "-arch armv7",
-    "-arch armv7s",
-    "-arch arm64",
-    "-D__thread=",
-    "-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS9.2.sdk/",
-]
-
 cc_library(
     name = "protobuf_lite",
     srcs = [
@@ -101,6 +72,7 @@ cc_library(
         "src/google/protobuf/extension_set.cc",
         "src/google/protobuf/generated_message_table_driven_lite.cc",
         "src/google/protobuf/generated_message_util.cc",
+        "src/google/protobuf/implicit_weak_message.cc",
         "src/google/protobuf/io/coded_stream.cc",
         "src/google/protobuf/io/zero_copy_stream.cc",
         "src/google/protobuf/io/zero_copy_stream_impl_lite.cc",
@@ -123,12 +95,7 @@ cc_library(
         "src/google/protobuf/wire_format_lite.cc",
     ],
     hdrs = glob(["src/google/protobuf/**/*.h"]),
-    copts = select({
-        ":ios_armv7": IOS_ARM_COPTS,
-        ":ios_armv7s": IOS_ARM_COPTS,
-        ":ios_arm64": IOS_ARM_COPTS,
-        "//conditions:default": [],
-    }) + COPTS,
+    copts = COPTS,
     includes = ["src/"],
     linkopts = LINK_OPTS,
     visibility = ["//visibility:public"],
@@ -195,12 +162,7 @@ cc_library(
         "src/google/protobuf/wrappers.pb.cc",
     ],
     hdrs = glob(["src/**/*.h"]),
-    copts = select({
-        ":ios_armv7": IOS_ARM_COPTS,
-        ":ios_armv7s": IOS_ARM_COPTS,
-        ":ios_arm64": IOS_ARM_COPTS,
-        "//conditions:default": [],
-    }) + COPTS,
+    copts = COPTS,
     includes = ["src/"],
     linkopts = LINK_OPTS,
     visibility = ["//visibility:public"],
@@ -541,6 +503,7 @@ cc_test(
         "src/google/protobuf/any_test.cc",
         "src/google/protobuf/arena_unittest.cc",
         "src/google/protobuf/arenastring_unittest.cc",
+        "src/google/protobuf/compiler/annotation_test_util.cc",
         "src/google/protobuf/compiler/command_line_interface_unittest.cc",
         "src/google/protobuf/compiler/cpp/cpp_bootstrap_unittest.cc",
         "src/google/protobuf/compiler/cpp/cpp_move_unittest.cc",

@@ -3478,7 +3478,8 @@ namespace Google.Protobuf.Reflection {
         = pb::FieldCodec.ForMessage(7994, global::Google.Protobuf.Reflection.UninterpretedOption.Parser);
     private readonly pbc::RepeatedField<global::Google.Protobuf.Reflection.UninterpretedOption> uninterpretedOption_ = new pbc::RepeatedField<global::Google.Protobuf.Reflection.UninterpretedOption>();
     /// <summary>
-    /// The parser stores options it doesn't recognize here. See above.
+    /// The parser stores options it doesn't recognize here.
+    /// See the documentation for the "Options" section above.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     public pbc::RepeatedField<global::Google.Protobuf.Reflection.UninterpretedOption> UninterpretedOption {
@@ -5455,7 +5456,7 @@ namespace Google.Protobuf.Reflection {
       if (IdentifierValue != other.IdentifierValue) return false;
       if (PositiveIntValue != other.PositiveIntValue) return false;
       if (NegativeIntValue != other.NegativeIntValue) return false;
-      if (DoubleValue != other.DoubleValue) return false;
+      if (!pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.Equals(DoubleValue, other.DoubleValue)) return false;
       if (StringValue != other.StringValue) return false;
       if (AggregateValue != other.AggregateValue) return false;
       return true;
@@ -5468,7 +5469,7 @@ namespace Google.Protobuf.Reflection {
       if (IdentifierValue.Length != 0) hash ^= IdentifierValue.GetHashCode();
       if (PositiveIntValue != 0UL) hash ^= PositiveIntValue.GetHashCode();
       if (NegativeIntValue != 0L) hash ^= NegativeIntValue.GetHashCode();
-      if (DoubleValue != 0D) hash ^= DoubleValue.GetHashCode();
+      if (DoubleValue != 0D) hash ^= pbc::ProtobufEqualityComparers.BitwiseDoubleEqualityComparer.GetHashCode(DoubleValue);
       if (StringValue.Length != 0) hash ^= StringValue.GetHashCode();
       if (AggregateValue.Length != 0) hash ^= AggregateValue.GetHashCode();
       return hash;

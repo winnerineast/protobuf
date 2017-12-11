@@ -676,6 +676,16 @@ TEST_F(MapImplTest, InsertByIterator) {
   ExpectElements(map1);
 }
 
+#if LANG_CXX11
+TEST_F(MapImplTest, InsertByInitializerList) {
+  map_.insert({{1, 100}, {2, 200}});
+  ExpectElements({{1, 100}, {2, 200}});
+
+  map_.insert({{2, 201}, {3, 301}});
+  ExpectElements({{1, 100}, {2, 200}, {3, 301}});
+}
+#endif
+
 TEST_F(MapImplTest, EraseSingleByKey) {
   int32 key = 0;
   int32 value = 100;
@@ -3282,6 +3292,44 @@ TEST(ArenaTest, IsInitialized) {
       Arena::CreateMessage<unittest::TestArenaMap>(&arena);
   EXPECT_EQ(0, (*message->mutable_map_int32_int32())[0]);
 }
+
+#if LANG_CXX11
+TEST(MoveTest, MoveConstructorWorks) {
+  Map<int32, TestAllTypes> original_map;
+  original_map[42].mutable_optional_nested_message()->set_bb(42);
+  original_map[43].mutable_optional_nested_message()->set_bb(43);
+  const auto* nested_msg42_ptr = &original_map[42].optional_nested_message();
+  const auto* nested_msg43_ptr = &original_map[43].optional_nested_message();
+
+  Map<int32, TestAllTypes> moved_to_map(std::move(original_map));
+  EXPECT_TRUE(original_map.empty());
+  EXPECT_EQ(2, moved_to_map.size());
+  EXPECT_EQ(42, moved_to_map[42].optional_nested_message().bb());
+  EXPECT_EQ(43, moved_to_map[43].optional_nested_message().bb());
+  // This test takes advantage of the fact that pointers are swapped, so there
+  // should be pointer stability.
+  EXPECT_EQ(nested_msg42_ptr, &moved_to_map[42].optional_nested_message());
+  EXPECT_EQ(nested_msg43_ptr, &moved_to_map[43].optional_nested_message());
+}
+
+TEST(MoveTest, MoveAssignmentWorks) {
+  Map<int32, TestAllTypes> original_map;
+  original_map[42].mutable_optional_nested_message()->set_bb(42);
+  original_map[43].mutable_optional_nested_message()->set_bb(43);
+  const auto* nested_msg42_ptr = &original_map[42].optional_nested_message();
+  const auto* nested_msg43_ptr = &original_map[43].optional_nested_message();
+
+  Map<int32, TestAllTypes> moved_to_map = std::move(original_map);
+  EXPECT_TRUE(original_map.empty());
+  EXPECT_EQ(2, moved_to_map.size());
+  EXPECT_EQ(42, moved_to_map[42].optional_nested_message().bb());
+  EXPECT_EQ(43, moved_to_map[43].optional_nested_message().bb());
+  // This test takes advantage of the fact that pointers are swapped, so there
+  // should be pointer stability.
+  EXPECT_EQ(nested_msg42_ptr, &moved_to_map[42].optional_nested_message());
+  EXPECT_EQ(nested_msg43_ptr, &moved_to_map[43].optional_nested_message());
+}
+#endif
 
 }  // namespace internal
 }  // namespace protobuf

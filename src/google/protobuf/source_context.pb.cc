@@ -14,6 +14,10 @@
 #include <google/protobuf/generated_message_reflection.h>
 #include <google/protobuf/reflection_ops.h>
 #include <google/protobuf/wire_format.h>
+// This is a temporary google only hack
+#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+#include "third_party/protobuf/version.h"
+#endif
 // @@protoc_insertion_point(includes)
 namespace google {
 namespace protobuf {
@@ -28,7 +32,11 @@ namespace protobuf_google_2fprotobuf_2fsource_5fcontext_2eproto {
 void InitDefaultsSourceContextImpl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
+#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
+#else
   ::google::protobuf::internal::InitProtobufDefaults();
+#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
   {
     void* ptr = &::google::protobuf::_SourceContext_default_instance_;
     new (ptr) ::google::protobuf::SourceContext();
@@ -167,13 +175,6 @@ const SourceContext& SourceContext::default_instance() {
   return *internal_default_instance();
 }
 
-SourceContext* SourceContext::New(::google::protobuf::Arena* arena) const {
-  SourceContext* n = new SourceContext;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
-}
 
 void SourceContext::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.SourceContext)
@@ -367,6 +368,13 @@ void SourceContext::InternalSwap(SourceContext* other) {
 
 
 // @@protoc_insertion_point(namespace_scope)
+}  // namespace protobuf
+}  // namespace google
+namespace google {
+namespace protobuf {
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::google::protobuf::SourceContext* Arena::Create< ::google::protobuf::SourceContext >(Arena* arena) {
+  return Arena::CreateInternal< ::google::protobuf::SourceContext >(arena);
+}
 }  // namespace protobuf
 }  // namespace google
 

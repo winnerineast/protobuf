@@ -14,6 +14,10 @@
 #include <google/protobuf/generated_message_reflection.h>
 #include <google/protobuf/reflection_ops.h>
 #include <google/protobuf/wire_format.h>
+// This is a temporary google only hack
+#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+#include "third_party/protobuf/version.h"
+#endif
 // @@protoc_insertion_point(includes)
 namespace google {
 namespace protobuf {
@@ -38,7 +42,11 @@ namespace protobuf_google_2fprotobuf_2fapi_2eproto {
 void InitDefaultsApiImpl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
+#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
+#else
   ::google::protobuf::internal::InitProtobufDefaults();
+#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
   protobuf_google_2fprotobuf_2fapi_2eproto::InitDefaultsMethod();
   protobuf_google_2fprotobuf_2ftype_2eproto::InitDefaultsOption();
   protobuf_google_2fprotobuf_2fsource_5fcontext_2eproto::InitDefaultsSourceContext();
@@ -59,7 +67,11 @@ void InitDefaultsApi() {
 void InitDefaultsMethodImpl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
+#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
+#else
   ::google::protobuf::internal::InitProtobufDefaults();
+#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
   protobuf_google_2fprotobuf_2ftype_2eproto::InitDefaultsOption();
   {
     void* ptr = &::google::protobuf::_Method_default_instance_;
@@ -77,7 +89,11 @@ void InitDefaultsMethod() {
 void InitDefaultsMixinImpl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
+#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
+#else
   ::google::protobuf::internal::InitProtobufDefaults();
+#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
   {
     void* ptr = &::google::protobuf::_Mixin_default_instance_;
     new (ptr) ::google::protobuf::Mixin();
@@ -208,6 +224,15 @@ void Api::InitAsDefaultInstance() {
   ::google::protobuf::_Api_default_instance_._instance.get_mutable()->source_context_ = const_cast< ::google::protobuf::SourceContext*>(
       ::google::protobuf::SourceContext::internal_default_instance());
 }
+void Api::clear_options() {
+  options_.Clear();
+}
+void Api::clear_source_context() {
+  if (GetArenaNoVirtual() == NULL && source_context_ != NULL) {
+    delete source_context_;
+  }
+  source_context_ = NULL;
+}
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Api::kNameFieldNumber;
 const int Api::kMethodsFieldNumber;
@@ -286,13 +311,6 @@ const Api& Api::default_instance() {
   return *internal_default_instance();
 }
 
-Api* Api::New(::google::protobuf::Arena* arena) const {
-  Api* n = new Api;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
-}
 
 void Api::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.Api)
@@ -343,7 +361,7 @@ bool Api::MergePartialFromCodedStream(
       case 2: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(18u /* 18 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                 input, add_methods()));
         } else {
           goto handle_unusual;
@@ -355,7 +373,7 @@ bool Api::MergePartialFromCodedStream(
       case 3: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(26u /* 26 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                 input, add_options()));
         } else {
           goto handle_unusual;
@@ -383,7 +401,7 @@ bool Api::MergePartialFromCodedStream(
       case 5: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(42u /* 42 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                input, mutable_source_context()));
         } else {
           goto handle_unusual;
@@ -395,7 +413,7 @@ bool Api::MergePartialFromCodedStream(
       case 6: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(50u /* 50 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                 input, add_mixins()));
         } else {
           goto handle_unusual;
@@ -458,14 +476,18 @@ void Api::SerializeWithCachedSizes(
   for (unsigned int i = 0,
       n = static_cast<unsigned int>(this->methods_size()); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      2, this->methods(static_cast<int>(i)), output);
+      2,
+      this->methods(static_cast<int>(i)),
+      output);
   }
 
   // repeated .google.protobuf.Option options = 3;
   for (unsigned int i = 0,
       n = static_cast<unsigned int>(this->options_size()); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      3, this->options(static_cast<int>(i)), output);
+      3,
+      this->options(static_cast<int>(i)),
+      output);
   }
 
   // string version = 4;
@@ -481,14 +503,16 @@ void Api::SerializeWithCachedSizes(
   // .google.protobuf.SourceContext source_context = 5;
   if (this->has_source_context()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      5, *this->source_context_, output);
+      5, *source_context_, output);
   }
 
   // repeated .google.protobuf.Mixin mixins = 6;
   for (unsigned int i = 0,
       n = static_cast<unsigned int>(this->mixins_size()); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      6, this->mixins(static_cast<int>(i)), output);
+      6,
+      this->mixins(static_cast<int>(i)),
+      output);
   }
 
   // .google.protobuf.Syntax syntax = 7;
@@ -526,7 +550,7 @@ void Api::SerializeWithCachedSizes(
   for (unsigned int i = 0,
       n = static_cast<unsigned int>(this->methods_size()); i < n; i++) {
     target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageNoVirtualToArray(
+      InternalWriteMessageToArray(
         2, this->methods(static_cast<int>(i)), deterministic, target);
   }
 
@@ -534,7 +558,7 @@ void Api::SerializeWithCachedSizes(
   for (unsigned int i = 0,
       n = static_cast<unsigned int>(this->options_size()); i < n; i++) {
     target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageNoVirtualToArray(
+      InternalWriteMessageToArray(
         3, this->options(static_cast<int>(i)), deterministic, target);
   }
 
@@ -552,15 +576,15 @@ void Api::SerializeWithCachedSizes(
   // .google.protobuf.SourceContext source_context = 5;
   if (this->has_source_context()) {
     target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageNoVirtualToArray(
-        5, *this->source_context_, deterministic, target);
+      InternalWriteMessageToArray(
+        5, *source_context_, deterministic, target);
   }
 
   // repeated .google.protobuf.Mixin mixins = 6;
   for (unsigned int i = 0,
       n = static_cast<unsigned int>(this->mixins_size()); i < n; i++) {
     target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageNoVirtualToArray(
+      InternalWriteMessageToArray(
         6, this->mixins(static_cast<int>(i)), deterministic, target);
   }
 
@@ -593,7 +617,7 @@ size_t Api::ByteSizeLong() const {
     total_size += 1UL * count;
     for (unsigned int i = 0; i < count; i++) {
       total_size +=
-        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+        ::google::protobuf::internal::WireFormatLite::MessageSize(
           this->methods(static_cast<int>(i)));
     }
   }
@@ -604,7 +628,7 @@ size_t Api::ByteSizeLong() const {
     total_size += 1UL * count;
     for (unsigned int i = 0; i < count; i++) {
       total_size +=
-        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+        ::google::protobuf::internal::WireFormatLite::MessageSize(
           this->options(static_cast<int>(i)));
     }
   }
@@ -615,7 +639,7 @@ size_t Api::ByteSizeLong() const {
     total_size += 1UL * count;
     for (unsigned int i = 0; i < count; i++) {
       total_size +=
-        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+        ::google::protobuf::internal::WireFormatLite::MessageSize(
           this->mixins(static_cast<int>(i)));
     }
   }
@@ -637,8 +661,8 @@ size_t Api::ByteSizeLong() const {
   // .google.protobuf.SourceContext source_context = 5;
   if (this->has_source_context()) {
     total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
-        *this->source_context_);
+      ::google::protobuf::internal::WireFormatLite::MessageSize(
+        *source_context_);
   }
 
   // .google.protobuf.Syntax syntax = 7;
@@ -719,9 +743,9 @@ void Api::Swap(Api* other) {
 }
 void Api::InternalSwap(Api* other) {
   using std::swap;
-  methods_.InternalSwap(&other->methods_);
-  options_.InternalSwap(&other->options_);
-  mixins_.InternalSwap(&other->mixins_);
+  CastToBase(&methods_)->InternalSwap(CastToBase(&other->methods_));
+  CastToBase(&options_)->InternalSwap(CastToBase(&other->options_));
+  CastToBase(&mixins_)->InternalSwap(CastToBase(&other->mixins_));
   name_.Swap(&other->name_);
   version_.Swap(&other->version_);
   swap(source_context_, other->source_context_);
@@ -739,6 +763,9 @@ void Api::InternalSwap(Api* other) {
 // ===================================================================
 
 void Method::InitAsDefaultInstance() {
+}
+void Method::clear_options() {
+  options_.Clear();
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int Method::kNameFieldNumber;
@@ -818,13 +845,6 @@ const Method& Method::default_instance() {
   return *internal_default_instance();
 }
 
-Method* Method::New(::google::protobuf::Arena* arena) const {
-  Method* n = new Method;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
-}
 
 void Method::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.Method)
@@ -932,7 +952,7 @@ bool Method::MergePartialFromCodedStream(
       case 6: {
         if (static_cast< ::google::protobuf::uint8>(tag) ==
             static_cast< ::google::protobuf::uint8>(50u /* 50 & 0xFF */)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
                 input, add_options()));
         } else {
           goto handle_unusual;
@@ -1025,7 +1045,9 @@ void Method::SerializeWithCachedSizes(
   for (unsigned int i = 0,
       n = static_cast<unsigned int>(this->options_size()); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      6, this->options(static_cast<int>(i)), output);
+      6,
+      this->options(static_cast<int>(i)),
+      output);
   }
 
   // .google.protobuf.Syntax syntax = 7;
@@ -1095,7 +1117,7 @@ void Method::SerializeWithCachedSizes(
   for (unsigned int i = 0,
       n = static_cast<unsigned int>(this->options_size()); i < n; i++) {
     target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageNoVirtualToArray(
+      InternalWriteMessageToArray(
         6, this->options(static_cast<int>(i)), deterministic, target);
   }
 
@@ -1128,7 +1150,7 @@ size_t Method::ByteSizeLong() const {
     total_size += 1UL * count;
     for (unsigned int i = 0; i < count; i++) {
       total_size +=
-        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+        ::google::protobuf::internal::WireFormatLite::MessageSize(
           this->options(static_cast<int>(i)));
     }
   }
@@ -1247,7 +1269,7 @@ void Method::Swap(Method* other) {
 }
 void Method::InternalSwap(Method* other) {
   using std::swap;
-  options_.InternalSwap(&other->options_);
+  CastToBase(&options_)->InternalSwap(CastToBase(&other->options_));
   name_.Swap(&other->name_);
   request_type_url_.Swap(&other->request_type_url_);
   response_type_url_.Swap(&other->response_type_url_);
@@ -1328,13 +1350,6 @@ const Mixin& Mixin::default_instance() {
   return *internal_default_instance();
 }
 
-Mixin* Mixin::New(::google::protobuf::Arena* arena) const {
-  Mixin* n = new Mixin;
-  if (arena != NULL) {
-    arena->Own(n);
-  }
-  return n;
-}
 
 void Mixin::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.Mixin)
@@ -1578,6 +1593,19 @@ void Mixin::InternalSwap(Mixin* other) {
 
 
 // @@protoc_insertion_point(namespace_scope)
+}  // namespace protobuf
+}  // namespace google
+namespace google {
+namespace protobuf {
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::google::protobuf::Api* Arena::Create< ::google::protobuf::Api >(Arena* arena) {
+  return Arena::CreateInternal< ::google::protobuf::Api >(arena);
+}
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::google::protobuf::Method* Arena::Create< ::google::protobuf::Method >(Arena* arena) {
+  return Arena::CreateInternal< ::google::protobuf::Method >(arena);
+}
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::google::protobuf::Mixin* Arena::Create< ::google::protobuf::Mixin >(Arena* arena) {
+  return Arena::CreateInternal< ::google::protobuf::Mixin >(arena);
+}
 }  // namespace protobuf
 }  // namespace google
 

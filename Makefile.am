@@ -61,8 +61,13 @@ csharp_EXTRA_DIST=                                                           \
   csharp/keys/Google.Protobuf.public.snk                                     \
   csharp/keys/Google.Protobuf.snk                                            \
   csharp/keys/README.md                                                      \
+  csharp/protos/README.md                                                    \
+  csharp/protos/map_unittest_proto3.proto                                    \
   csharp/protos/unittest_custom_options_proto3.proto                         \
+  csharp/protos/unittest_import_public_proto3.proto                          \
+  csharp/protos/unittest_import_proto3.proto                                 \
   csharp/protos/unittest_issues.proto                                        \
+  csharp/protos/unittest_proto3.proto                                        \
   csharp/src/AddressBook/AddPerson.cs                                        \
   csharp/src/AddressBook/Addressbook.cs                                      \
   csharp/src/AddressBook/AddressBook.csproj                                  \
@@ -79,6 +84,7 @@ csharp_EXTRA_DIST=                                                           \
   csharp/src/Google.Protobuf.Test/CodedInputStreamTest.cs                    \
   csharp/src/Google.Protobuf.Test/CodedOutputStreamTest.cs                   \
   csharp/src/Google.Protobuf.Test/Collections/MapFieldTest.cs                \
+  csharp/src/Google.Protobuf.Test/Collections/ProtobufEqualityComparersTest.cs \
   csharp/src/Google.Protobuf.Test/Collections/RepeatedFieldTest.cs           \
   csharp/src/Google.Protobuf.Test/Compatibility/PropertyInfoExtensionsTest.cs \
   csharp/src/Google.Protobuf.Test/Compatibility/StreamExtensionsTest.cs      \
@@ -99,6 +105,7 @@ csharp_EXTRA_DIST=                                                           \
   csharp/src/Google.Protobuf.Test/Reflection/TypeRegistryTest.cs             \
   csharp/src/Google.Protobuf.Test/SampleEnum.cs                              \
   csharp/src/Google.Protobuf.Test/SampleMessages.cs                          \
+  csharp/src/Google.Protobuf.Test/SampleNaNs.cs                              \
   csharp/src/Google.Protobuf.Test/TestCornerCases.cs                         \
   csharp/src/Google.Protobuf.Test/TestProtos/ForeignMessagePartial.cs        \
   csharp/src/Google.Protobuf.Test/TestProtos/MapUnittestProto3.cs            \
@@ -121,6 +128,7 @@ csharp_EXTRA_DIST=                                                           \
   csharp/src/Google.Protobuf/CodedOutputStream.ComputeSize.cs                \
   csharp/src/Google.Protobuf/CodedOutputStream.cs                            \
   csharp/src/Google.Protobuf/Collections/MapField.cs                         \
+  csharp/src/Google.Protobuf/Collections/ProtobufEqualityComparers.cs        \
   csharp/src/Google.Protobuf/Collections/ReadOnlyDictionary.cs               \
   csharp/src/Google.Protobuf/Collections/RepeatedField.cs                    \
   csharp/src/Google.Protobuf/Compatibility/PropertyInfoExtensions.cs         \
@@ -199,6 +207,7 @@ java_EXTRA_DIST=                                                                
   java/core/src/main/java/com/google/protobuf/AbstractMessageLite.java             \
   java/core/src/main/java/com/google/protobuf/AbstractParser.java                  \
   java/core/src/main/java/com/google/protobuf/AbstractProtobufList.java            \
+  java/core/src/main/java/com/google/protobuf/Android.java                         \
   java/core/src/main/java/com/google/protobuf/BlockingRpcChannel.java              \
   java/core/src/main/java/com/google/protobuf/BlockingService.java                 \
   java/core/src/main/java/com/google/protobuf/BooleanArrayList.java                \
@@ -281,6 +290,7 @@ java_EXTRA_DIST=                                                                
   java/core/src/test/java/com/google/protobuf/CheckUtf8Test.java                   \
   java/core/src/test/java/com/google/protobuf/CodedInputStreamTest.java            \
   java/core/src/test/java/com/google/protobuf/CodedOutputStreamTest.java           \
+  java/core/src/test/java/com/google/protobuf/DecodeUtf8Test.java                  \
   java/core/src/test/java/com/google/protobuf/DeprecatedFieldTest.java             \
   java/core/src/test/java/com/google/protobuf/DescriptorsTest.java                 \
   java/core/src/test/java/com/google/protobuf/DiscardUnknownFieldsTest.java        \
@@ -333,6 +343,7 @@ java_EXTRA_DIST=                                                                
   java/core/src/test/java/com/google/protobuf/WellKnownTypesTest.java              \
   java/core/src/test/java/com/google/protobuf/WireFormatTest.java                  \
   java/core/src/test/proto/com/google/protobuf/any_test.proto                      \
+  java/core/src/test/proto/com/google/protobuf/deprecated_file.proto               \
   java/core/src/test/proto/com/google/protobuf/field_presence_test.proto           \
   java/core/src/test/proto/com/google/protobuf/lazy_fields_lite.proto              \
   java/core/src/test/proto/com/google/protobuf/lite_equals_and_hash.proto          \
@@ -552,15 +563,20 @@ objectivec_EXTRA_DIST=                                                       \
   objectivec/Tests/GPBWireFormatTests.m                                      \
   objectivec/Tests/iOSTestHarness/AppDelegate.m                              \
   objectivec/Tests/iOSTestHarness/en.lproj/InfoPlist.strings                 \
-  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/Contents.json      \
-  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/iPad6.png          \
-  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/iPad6_2x.png       \
-  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/iPad7.png          \
-  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/iPad7_2x.png       \
-  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/iPhone6.png        \
-  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/iPhone6_2x.png     \
-  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/iPhone7_2x.png     \
-  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/iPhone7_3x.png     \
+  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/appicon_20.png \
+  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/appicon_29.png \
+  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/appicon_40.png \
+  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/appicon_58.png \
+  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/appicon_60.png \
+  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/appicon_76.png \
+  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/appicon_80.png \
+  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/appicon_87.png \
+  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/appicon_120.png \
+  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/appicon_152.png \
+  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/appicon_167.png \
+  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/appicon_180.png \
+  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/appicon_1024.png \
+  objectivec/Tests/iOSTestHarness/Images.xcassets/AppIcon.appiconset/Contents.json \
   objectivec/Tests/iOSTestHarness/Images.xcassets/LaunchImage.launchimage/Contents.json \
   objectivec/Tests/iOSTestHarness/Info.plist                                  \
   objectivec/Tests/iOSTestHarness/LaunchScreen.xib                            \
@@ -647,9 +663,13 @@ php_EXTRA_DIST=                                                       \
   php/src/Google/Protobuf/Internal/EnumBuilderContext.php             \
   php/src/Google/Protobuf/Internal/EnumDescriptor.php                 \
   php/src/Google/Protobuf/Internal/EnumDescriptorProto.php            \
+  php/src/Google/Protobuf/Internal/EnumDescriptorProto_EnumReservedRange.php \
   php/src/Google/Protobuf/Internal/EnumOptions.php                    \
   php/src/Google/Protobuf/Internal/EnumValueDescriptorProto.php       \
   php/src/Google/Protobuf/Internal/EnumValueOptions.php               \
+  php/src/Google/Protobuf/Internal/ExtensionRangeOptions.php          \
+  php/src/Google/Protobuf/Internal/FieldDescriptorProto_Label.php     \
+  php/src/Google/Protobuf/Internal/FieldDescriptorProto.php           \
   php/src/Google/Protobuf/Internal/FieldDescriptor.php                \
   php/src/Google/Protobuf/Internal/FieldDescriptorProto.php           \
   php/src/Google/Protobuf/Internal/FieldDescriptorProto_Label.php     \
@@ -732,6 +752,12 @@ php_EXTRA_DIST=                                                       \
   php/tests/proto/test_no_namespace.proto                             \
   php/tests/proto/test_php_namespace.proto                            \
   php/tests/proto/test_prefix.proto                                   \
+  php/tests/proto/test_reserved_enum_lower.proto                      \
+  php/tests/proto/test_reserved_enum_upper.proto                      \
+  php/tests/proto/test_reserved_enum_value_lower.proto                \
+  php/tests/proto/test_reserved_enum_value_upper.proto                \
+  php/tests/proto/test_reserved_message_lower.proto                   \
+  php/tests/proto/test_reserved_message_upper.proto                   \
   php/tests/proto/test_service.proto                                  \
   php/tests/proto/test_service_namespace.proto                        \
   php/tests/test.sh                                                   \
@@ -1025,8 +1051,10 @@ EXTRA_DIST = $(@DIST_LANG@_EXTRA_DIST)   \
   cmake/libprotoc.cmake                  \
   cmake/protobuf-config-version.cmake.in \
   cmake/protobuf-config.cmake.in         \
+  cmake/protobuf-lite.pc.cmake           \
   cmake/protobuf-module.cmake.in         \
   cmake/protobuf-options.cmake           \
+  cmake/protobuf.pc.cmake                \
   cmake/protoc.cmake                     \
   cmake/tests.cmake                      \
   editors/README.txt                     \

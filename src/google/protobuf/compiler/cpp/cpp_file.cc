@@ -303,6 +303,18 @@ void FileGenerator::GenerateSourceIncludes(io::Printer* printer) {
     }
   }
 
+  // TODO(gerbens) Remove this when all code in google is using the same
+  // proto library. This is a temporary hack to force build errors if
+  // the proto library is compiled with GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+  // and is also linking internal proto2. This is to prevent regressions while
+  // we work cleaning up the code base. After this is completed and we have
+  // one proto lib all code uses this should be removed.
+  printer->Print(
+    "// This is a temporary google only hack\n"
+    "#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS\n"
+    "#include \"third_party/protobuf/version.h\"\n"
+    "#endif\n");
+
   printer->Print(
     "// @@protoc_insertion_point(includes)\n");
 }
@@ -385,6 +397,10 @@ void FileGenerator::GenerateSourceForMessage(int idx, io::Printer* printer) {
 
     // Define default instances
     GenerateSourceDefaultInstance(idx, printer);
+    if (options_.lite_implicit_weak_fields) {
+      printer->Print("void $classname$_ReferenceStrong() {}\n", "classname",
+                     message_generators_[idx]->classname_);
+    }
 
     // Generate classes.
     printer->Print("\n");
@@ -399,6 +415,13 @@ void FileGenerator::GenerateSourceForMessage(int idx, io::Printer* printer) {
     NamespaceOpener ns(FileLevelNamespace(file_), printer);
     GenerateInitForSCC(GetSCC(message_generators_[idx]->descriptor_), printer);
   }
+
+
+  printer->Print(
+      "namespace google {\nnamespace protobuf {\n");
+  message_generators_[idx]->GenerateSourceInProto2Namespace(printer);
+  printer->Print(
+      "}  // namespace protobuf\n}  // namespace google\n");
 
   printer->Print(
       "\n"
@@ -451,8 +474,8 @@ void FileGenerator::GenerateSource(io::Printer* printer) {
     // Define default instances
     for (int i = 0; i < message_generators_.size(); i++) {
       GenerateSourceDefaultInstance(i, printer);
-      if (UsingImplicitWeakFields(file_, options_)) {
-        printer->Print("void $classname$_Reference() {}\n", "classname",
+      if (options_.lite_implicit_weak_fields) {
+        printer->Print("void $classname$_ReferenceStrong() {}\n", "classname",
                        message_generators_[i]->classname_);
       }
     }
@@ -509,6 +532,15 @@ void FileGenerator::GenerateSource(io::Printer* printer) {
       "\n"
       "// @@protoc_insertion_point(namespace_scope)\n");
   }
+
+  printer->Print(
+      "namespace google {\nnamespace protobuf {\n");
+  for (int i = 0; i < message_generators_.size(); i++) {
+    message_generators_[i]->GenerateSourceInProto2Namespace(printer);
+  }
+  printer->Print(
+      "}  // namespace protobuf\n}  // namespace google\n");
+
   printer->Print(
     "\n"
     "// @@protoc_insertion_point(global_scope)\n");
@@ -537,7 +569,42 @@ class FileGenerator::ForwardDeclarations {
   std::map<string, const Descriptor*>& classes() { return classes_; }
   std::map<string, const EnumDescriptor*>& enums() { return enums_; }
 
-  void Print(io::Printer* printer, const Options& options) const {
+  void PrintForwardDeclarations(io::Printer* printer,
+                                const Options& options) const {
+    PrintNestedDeclarations(printer, options);
+    PrintTopLevelDeclarations(printer, options);
+  }
+
+
+ private:
+  void PrintNestedDeclarations(io::Printer* printer,
+                               const Options& options) const {
+    PrintDeclarationsInsideNamespace(printer, options);
+    for (std::map<string, ForwardDeclarations *>::const_iterator
+             it = namespaces_.begin(),
+             end = namespaces_.end();
+         it != end; ++it) {
+      printer->Print("namespace $nsname$ {\n",
+                     "nsname", it->first);
+      it->second->PrintNestedDeclarations(printer, options);
+      printer->Print("}  // namespace $nsname$\n",
+                     "nsname", it->first);
+    }
+  }
+
+  void PrintTopLevelDeclarations(io::Printer* printer,
+                                 const Options& options) const {
+    PrintDeclarationsOutsideNamespace(printer, options);
+    for (std::map<string, ForwardDeclarations *>::const_iterator
+             it = namespaces_.begin(),
+             end = namespaces_.end();
+         it != end; ++it) {
+      it->second->PrintTopLevelDeclarations(printer, options);
+    }
+  }
+
+  void PrintDeclarationsInsideNamespace(io::Printer* printer,
+                                        const Options& options) const {
     for (std::map<string, const EnumDescriptor *>::const_iterator
              it = enums_.begin(),
              end = enums_.end();
@@ -564,24 +631,40 @@ class FileGenerator::ForwardDeclarations {
           "classname",
           it->first);
       if (options.lite_implicit_weak_fields) {
-        printer->Print("void $classname$_Reference();\n",
+        printer->Print("void $classname$_ReferenceStrong();\n",
                        "classname", it->first);
       }
     }
-    for (std::map<string, ForwardDeclarations *>::const_iterator
-             it = namespaces_.begin(),
-             end = namespaces_.end();
-         it != end; ++it) {
-      printer->Print("namespace $nsname$ {\n",
-                     "nsname", it->first);
-      it->second->Print(printer, options);
-      printer->Print("}  // namespace $nsname$\n",
-                     "nsname", it->first);
-    }
   }
 
+  void PrintDeclarationsOutsideNamespace(io::Printer* printer,
+                                         const Options& options) const {
+    if (classes_.size() == 0) return;
 
- private:
+    printer->Print(
+        "namespace google {\nnamespace protobuf {\n");
+    for (std::map<string, const Descriptor*>::const_iterator
+             it = classes_.begin(),
+             end = classes_.end();
+         it != end; ++it) {
+      const Descriptor* d = it->second;
+      string extra_class_qualifier;
+      // "class" is to disambiguate in case there is also a function with this
+      // name.  There is code out there that does this!
+      printer->Print(
+          "template<> "
+          "$dllexport_decl$"
+          "$class$$classname$* Arena::$func$< $class$$classname$>(Arena*);\n",
+          "classname", QualifiedClassName(d),
+          "func", MessageCreateFunction(d),
+          "class", extra_class_qualifier,
+          "dllexport_decl",
+          options.dllexport_decl.empty() ? "" : options.dllexport_decl + " ");
+    }
+    printer->Print(
+        "}  // namespace protobuf\n}  // namespace google\n");
+  }
+
   std::map<string, ForwardDeclarations*> namespaces_;
   std::map<string, const Descriptor*> classes_;
   std::map<string, const EnumDescriptor*> enums_;
@@ -827,8 +910,12 @@ void FileGenerator::GenerateInitForSCC(const SCC* scc, io::Printer* printer) {
   printer->Print(
       "void InitDefaults$scc_name$Impl() {\n"
       "  GOOGLE_PROTOBUF_VERIFY_VERSION;\n\n"
+      "#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS\n"
+      "  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();\n"
+      "#else\n"
+      "  ::google::protobuf::internal::InitProtobufDefaults();\n"
+      "#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS\n",
         // Force initialization of primitive values we depend on.
-      "  ::google::protobuf::internal::InitProtobufDefaults();\n",
       "scc_name", scc_name);
 
   printer->Indent();
@@ -1033,7 +1120,7 @@ void FileGenerator::GenerateInitializationCode(io::Printer* printer) {
 void FileGenerator::GenerateForwardDeclarations(io::Printer* printer) {
   ForwardDeclarations decls;
   FillForwardDeclarations(&decls);
-  decls.Print(printer, options_);
+  decls.PrintForwardDeclarations(printer, options_);
 }
 
 void FileGenerator::FillForwardDeclarations(ForwardDeclarations* decls) {
@@ -1317,8 +1404,7 @@ void FileGenerator::GenerateInlineFunctionDefinitions(io::Printer* printer) {
       printer->Print(kThinSeparator);
       printer->Print("\n");
     }
-    message_generators_[i]->GenerateInlineMethods(printer,
-                                                  /* is_inline = */ true);
+    message_generators_[i]->GenerateInlineMethods(printer);
   }
   printer->Print(
     "#ifdef __GNUC__\n"

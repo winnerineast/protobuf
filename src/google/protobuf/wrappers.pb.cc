@@ -14,6 +14,10 @@
 #include <google/protobuf/generated_message_reflection.h>
 #include <google/protobuf/reflection_ops.h>
 #include <google/protobuf/wire_format.h>
+// This is a temporary google only hack
+#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+#include "third_party/protobuf/version.h"
+#endif
 // @@protoc_insertion_point(includes)
 namespace google {
 namespace protobuf {
@@ -68,7 +72,11 @@ namespace protobuf_google_2fprotobuf_2fwrappers_2eproto {
 void InitDefaultsDoubleValueImpl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
+#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
+#else
   ::google::protobuf::internal::InitProtobufDefaults();
+#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
   {
     void* ptr = &::google::protobuf::_DoubleValue_default_instance_;
     new (ptr) ::google::protobuf::DoubleValue();
@@ -85,7 +93,11 @@ void InitDefaultsDoubleValue() {
 void InitDefaultsFloatValueImpl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
+#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
+#else
   ::google::protobuf::internal::InitProtobufDefaults();
+#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
   {
     void* ptr = &::google::protobuf::_FloatValue_default_instance_;
     new (ptr) ::google::protobuf::FloatValue();
@@ -102,7 +114,11 @@ void InitDefaultsFloatValue() {
 void InitDefaultsInt64ValueImpl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
+#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
+#else
   ::google::protobuf::internal::InitProtobufDefaults();
+#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
   {
     void* ptr = &::google::protobuf::_Int64Value_default_instance_;
     new (ptr) ::google::protobuf::Int64Value();
@@ -119,7 +135,11 @@ void InitDefaultsInt64Value() {
 void InitDefaultsUInt64ValueImpl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
+#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
+#else
   ::google::protobuf::internal::InitProtobufDefaults();
+#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
   {
     void* ptr = &::google::protobuf::_UInt64Value_default_instance_;
     new (ptr) ::google::protobuf::UInt64Value();
@@ -136,7 +156,11 @@ void InitDefaultsUInt64Value() {
 void InitDefaultsInt32ValueImpl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
+#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
+#else
   ::google::protobuf::internal::InitProtobufDefaults();
+#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
   {
     void* ptr = &::google::protobuf::_Int32Value_default_instance_;
     new (ptr) ::google::protobuf::Int32Value();
@@ -153,7 +177,11 @@ void InitDefaultsInt32Value() {
 void InitDefaultsUInt32ValueImpl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
+#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
+#else
   ::google::protobuf::internal::InitProtobufDefaults();
+#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
   {
     void* ptr = &::google::protobuf::_UInt32Value_default_instance_;
     new (ptr) ::google::protobuf::UInt32Value();
@@ -170,7 +198,11 @@ void InitDefaultsUInt32Value() {
 void InitDefaultsBoolValueImpl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
+#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
+#else
   ::google::protobuf::internal::InitProtobufDefaults();
+#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
   {
     void* ptr = &::google::protobuf::_BoolValue_default_instance_;
     new (ptr) ::google::protobuf::BoolValue();
@@ -187,7 +219,11 @@ void InitDefaultsBoolValue() {
 void InitDefaultsStringValueImpl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
+#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
+#else
   ::google::protobuf::internal::InitProtobufDefaults();
+#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
   {
     void* ptr = &::google::protobuf::_StringValue_default_instance_;
     new (ptr) ::google::protobuf::StringValue();
@@ -204,7 +240,11 @@ void InitDefaultsStringValue() {
 void InitDefaultsBytesValueImpl() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
+#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
+  ::google::protobuf::internal::InitProtobufDefaultsForceUnique();
+#else
   ::google::protobuf::internal::InitProtobufDefaults();
+#endif  // GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
   {
     void* ptr = &::google::protobuf::_BytesValue_default_instance_;
     new (ptr) ::google::protobuf::BytesValue();
@@ -399,12 +439,7 @@ DoubleValue::~DoubleValue() {
 }
 
 void DoubleValue::SharedDtor() {
-  ::google::protobuf::Arena* arena = GetArenaNoVirtual();
-  GOOGLE_DCHECK(arena == NULL);
-  if (arena != NULL) {
-    return;
-  }
-
+  GOOGLE_DCHECK(GetArenaNoVirtual() == NULL);
 }
 
 void DoubleValue::ArenaDtor(void* object) {
@@ -428,9 +463,6 @@ const DoubleValue& DoubleValue::default_instance() {
   return *internal_default_instance();
 }
 
-DoubleValue* DoubleValue::New(::google::protobuf::Arena* arena) const {
-  return ::google::protobuf::Arena::CreateMessage<DoubleValue>(arena);
-}
 
 void DoubleValue::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.DoubleValue)
@@ -666,12 +698,7 @@ FloatValue::~FloatValue() {
 }
 
 void FloatValue::SharedDtor() {
-  ::google::protobuf::Arena* arena = GetArenaNoVirtual();
-  GOOGLE_DCHECK(arena == NULL);
-  if (arena != NULL) {
-    return;
-  }
-
+  GOOGLE_DCHECK(GetArenaNoVirtual() == NULL);
 }
 
 void FloatValue::ArenaDtor(void* object) {
@@ -695,9 +722,6 @@ const FloatValue& FloatValue::default_instance() {
   return *internal_default_instance();
 }
 
-FloatValue* FloatValue::New(::google::protobuf::Arena* arena) const {
-  return ::google::protobuf::Arena::CreateMessage<FloatValue>(arena);
-}
 
 void FloatValue::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.FloatValue)
@@ -933,12 +957,7 @@ Int64Value::~Int64Value() {
 }
 
 void Int64Value::SharedDtor() {
-  ::google::protobuf::Arena* arena = GetArenaNoVirtual();
-  GOOGLE_DCHECK(arena == NULL);
-  if (arena != NULL) {
-    return;
-  }
-
+  GOOGLE_DCHECK(GetArenaNoVirtual() == NULL);
 }
 
 void Int64Value::ArenaDtor(void* object) {
@@ -962,9 +981,6 @@ const Int64Value& Int64Value::default_instance() {
   return *internal_default_instance();
 }
 
-Int64Value* Int64Value::New(::google::protobuf::Arena* arena) const {
-  return ::google::protobuf::Arena::CreateMessage<Int64Value>(arena);
-}
 
 void Int64Value::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.Int64Value)
@@ -1202,12 +1218,7 @@ UInt64Value::~UInt64Value() {
 }
 
 void UInt64Value::SharedDtor() {
-  ::google::protobuf::Arena* arena = GetArenaNoVirtual();
-  GOOGLE_DCHECK(arena == NULL);
-  if (arena != NULL) {
-    return;
-  }
-
+  GOOGLE_DCHECK(GetArenaNoVirtual() == NULL);
 }
 
 void UInt64Value::ArenaDtor(void* object) {
@@ -1231,9 +1242,6 @@ const UInt64Value& UInt64Value::default_instance() {
   return *internal_default_instance();
 }
 
-UInt64Value* UInt64Value::New(::google::protobuf::Arena* arena) const {
-  return ::google::protobuf::Arena::CreateMessage<UInt64Value>(arena);
-}
 
 void UInt64Value::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.UInt64Value)
@@ -1471,12 +1479,7 @@ Int32Value::~Int32Value() {
 }
 
 void Int32Value::SharedDtor() {
-  ::google::protobuf::Arena* arena = GetArenaNoVirtual();
-  GOOGLE_DCHECK(arena == NULL);
-  if (arena != NULL) {
-    return;
-  }
-
+  GOOGLE_DCHECK(GetArenaNoVirtual() == NULL);
 }
 
 void Int32Value::ArenaDtor(void* object) {
@@ -1500,9 +1503,6 @@ const Int32Value& Int32Value::default_instance() {
   return *internal_default_instance();
 }
 
-Int32Value* Int32Value::New(::google::protobuf::Arena* arena) const {
-  return ::google::protobuf::Arena::CreateMessage<Int32Value>(arena);
-}
 
 void Int32Value::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.Int32Value)
@@ -1740,12 +1740,7 @@ UInt32Value::~UInt32Value() {
 }
 
 void UInt32Value::SharedDtor() {
-  ::google::protobuf::Arena* arena = GetArenaNoVirtual();
-  GOOGLE_DCHECK(arena == NULL);
-  if (arena != NULL) {
-    return;
-  }
-
+  GOOGLE_DCHECK(GetArenaNoVirtual() == NULL);
 }
 
 void UInt32Value::ArenaDtor(void* object) {
@@ -1769,9 +1764,6 @@ const UInt32Value& UInt32Value::default_instance() {
   return *internal_default_instance();
 }
 
-UInt32Value* UInt32Value::New(::google::protobuf::Arena* arena) const {
-  return ::google::protobuf::Arena::CreateMessage<UInt32Value>(arena);
-}
 
 void UInt32Value::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.UInt32Value)
@@ -2009,12 +2001,7 @@ BoolValue::~BoolValue() {
 }
 
 void BoolValue::SharedDtor() {
-  ::google::protobuf::Arena* arena = GetArenaNoVirtual();
-  GOOGLE_DCHECK(arena == NULL);
-  if (arena != NULL) {
-    return;
-  }
-
+  GOOGLE_DCHECK(GetArenaNoVirtual() == NULL);
 }
 
 void BoolValue::ArenaDtor(void* object) {
@@ -2038,9 +2025,6 @@ const BoolValue& BoolValue::default_instance() {
   return *internal_default_instance();
 }
 
-BoolValue* BoolValue::New(::google::protobuf::Arena* arena) const {
-  return ::google::protobuf::Arena::CreateMessage<BoolValue>(arena);
-}
 
 void BoolValue::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.BoolValue)
@@ -2280,13 +2264,8 @@ StringValue::~StringValue() {
 }
 
 void StringValue::SharedDtor() {
-  ::google::protobuf::Arena* arena = GetArenaNoVirtual();
-  GOOGLE_DCHECK(arena == NULL);
-  if (arena != NULL) {
-    return;
-  }
-
-  value_.Destroy(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), arena);
+  GOOGLE_DCHECK(GetArenaNoVirtual() == NULL);
+  value_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 void StringValue::ArenaDtor(void* object) {
@@ -2310,9 +2289,6 @@ const StringValue& StringValue::default_instance() {
   return *internal_default_instance();
 }
 
-StringValue* StringValue::New(::google::protobuf::Arena* arena) const {
-  return ::google::protobuf::Arena::CreateMessage<StringValue>(arena);
-}
 
 void StringValue::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.StringValue)
@@ -2567,13 +2543,8 @@ BytesValue::~BytesValue() {
 }
 
 void BytesValue::SharedDtor() {
-  ::google::protobuf::Arena* arena = GetArenaNoVirtual();
-  GOOGLE_DCHECK(arena == NULL);
-  if (arena != NULL) {
-    return;
-  }
-
-  value_.Destroy(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), arena);
+  GOOGLE_DCHECK(GetArenaNoVirtual() == NULL);
+  value_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 
 void BytesValue::ArenaDtor(void* object) {
@@ -2597,9 +2568,6 @@ const BytesValue& BytesValue::default_instance() {
   return *internal_default_instance();
 }
 
-BytesValue* BytesValue::New(::google::protobuf::Arena* arena) const {
-  return ::google::protobuf::Arena::CreateMessage<BytesValue>(arena);
-}
 
 void BytesValue::Clear() {
 // @@protoc_insertion_point(message_clear_start:google.protobuf.BytesValue)
@@ -2795,6 +2763,37 @@ void BytesValue::InternalSwap(BytesValue* other) {
 
 
 // @@protoc_insertion_point(namespace_scope)
+}  // namespace protobuf
+}  // namespace google
+namespace google {
+namespace protobuf {
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::google::protobuf::DoubleValue* Arena::CreateMessage< ::google::protobuf::DoubleValue >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::google::protobuf::DoubleValue >(arena);
+}
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::google::protobuf::FloatValue* Arena::CreateMessage< ::google::protobuf::FloatValue >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::google::protobuf::FloatValue >(arena);
+}
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::google::protobuf::Int64Value* Arena::CreateMessage< ::google::protobuf::Int64Value >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::google::protobuf::Int64Value >(arena);
+}
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::google::protobuf::UInt64Value* Arena::CreateMessage< ::google::protobuf::UInt64Value >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::google::protobuf::UInt64Value >(arena);
+}
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::google::protobuf::Int32Value* Arena::CreateMessage< ::google::protobuf::Int32Value >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::google::protobuf::Int32Value >(arena);
+}
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::google::protobuf::UInt32Value* Arena::CreateMessage< ::google::protobuf::UInt32Value >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::google::protobuf::UInt32Value >(arena);
+}
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::google::protobuf::BoolValue* Arena::CreateMessage< ::google::protobuf::BoolValue >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::google::protobuf::BoolValue >(arena);
+}
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::google::protobuf::StringValue* Arena::CreateMessage< ::google::protobuf::StringValue >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::google::protobuf::StringValue >(arena);
+}
+template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::google::protobuf::BytesValue* Arena::CreateMessage< ::google::protobuf::BytesValue >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::google::protobuf::BytesValue >(arena);
+}
 }  // namespace protobuf
 }  // namespace google
 
