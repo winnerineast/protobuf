@@ -54,9 +54,7 @@ final class LongArrayList extends AbstractProtobufList<Long>
     return EMPTY_LIST;
   }
 
-  /**
-   * The backing store for the list.
-   */
+  /** The backing store for the list. */
   private long[] array;
 
   /**
@@ -65,20 +63,29 @@ final class LongArrayList extends AbstractProtobufList<Long>
    */
   private int size;
 
-  /**
-   * Constructs a new mutable {@code LongArrayList} with default capacity.
-   */
+  /** Constructs a new mutable {@code LongArrayList} with default capacity. */
   LongArrayList() {
     this(new long[DEFAULT_CAPACITY], 0);
   }
 
   /**
-   * Constructs a new mutable {@code LongArrayList}
-   * containing the same elements as {@code other}.
+   * Constructs a new mutable {@code LongArrayList} containing the same elements as {@code other}.
    */
   private LongArrayList(long[] other, int size) {
     array = other;
     this.size = size;
+  }
+
+  @Override
+  protected void removeRange(int fromIndex, int toIndex) {
+    ensureIsMutable();
+    if (toIndex < fromIndex) {
+      throw new IndexOutOfBoundsException("toIndex < fromIndex");
+    }
+
+    System.arraycopy(array, toIndex, array, fromIndex, size - toIndex);
+    size -= (toIndex - fromIndex);
+    modCount++;
   }
 
   @Override
@@ -156,17 +163,13 @@ final class LongArrayList extends AbstractProtobufList<Long>
     addLong(index, element);
   }
 
-  /**
-   * Like {@link #add(Long)} but more efficient in that it doesn't box the element.
-   */
+  /** Like {@link #add(Long)} but more efficient in that it doesn't box the element. */
   @Override
   public void addLong(long element) {
     addLong(size, element);
   }
 
-  /**
-   * Like {@link #add(int, Long)} but more efficient in that it doesn't box the element.
-   */
+  /** Like {@link #add(int, Long)} but more efficient in that it doesn't box the element. */
   private void addLong(int index, long element) {
     ensureIsMutable();
     if (index < 0 || index > size) {
@@ -232,7 +235,7 @@ final class LongArrayList extends AbstractProtobufList<Long>
     ensureIsMutable();
     for (int i = 0; i < size; i++) {
       if (o.equals(array[i])) {
-        System.arraycopy(array, i + 1, array, i, size - i);
+        System.arraycopy(array, i + 1, array, i, size - i - 1);
         size--;
         modCount++;
         return true;
@@ -246,7 +249,9 @@ final class LongArrayList extends AbstractProtobufList<Long>
     ensureIsMutable();
     ensureIndexInRange(index);
     long value = array[index];
-    System.arraycopy(array, index + 1, array, index, size - index);
+    if (index < size - 1) {
+      System.arraycopy(array, index + 1, array, index, size - index - 1);
+    }
     size--;
     modCount++;
     return value;

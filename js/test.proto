@@ -165,6 +165,13 @@ message TestClone {
   extensions 10 to max;
 }
 
+message TestCloneExtension {
+  extend TestClone {
+    optional TestCloneExtension low_ext = 11;
+  }
+  optional int32 f = 1;
+}
+
 message CloneExtension {
   extend TestClone {
     optional CloneExtension ext_field = 100;
@@ -232,6 +239,17 @@ message TestMessageWithOneof {
 message TestEndsWithBytes {
   optional int32 value = 1;
   optional bytes data = 2;
+}
+
+// This message is for testing extension handling doesn't affect fields before
+// pivot. Don't add new field to this message. See b/117298778 for more detail.
+message TestLastFieldBeforePivot {
+  optional int32 last_field_before_pivot = 1;
+  extensions 100 to max;
+}
+
+extend TestLastFieldBeforePivot {
+  optional int32 extend_test_last_field_before_pivot_field = 101;
 }
 
 
