@@ -167,6 +167,23 @@ class EncodeDecodeTest extends TestBase
         $this->assertSame("\"YQ==\"", $m->serializeToJsonString());
     }
 
+    public function generateRandomString($length = 10) {
+        $randomString = str_repeat("+", $length);
+        for ($i = 0; $i < $length; $i++) {
+            $randomString[$i] = rand(0, 255);
+        }
+        return $randomString;
+    }
+
+    public function testEncodeTopLevelLongBytesValue()
+    {
+        $m = new BytesValue();
+        $data = $this->generateRandomString(12007);
+        $m->setValue($data);
+        $expected = "\"" . base64_encode($data) . "\"";
+        $this->assertSame(strlen($expected), strlen($m->serializeToJsonString()));
+    }
+
     public function testEncode()
     {
         $from = new TestMessage();
@@ -1133,6 +1150,29 @@ class EncodeDecodeTest extends TestBase
         $m = new FieldMask();
         $m->mergeFromJsonString("\"\"");
         $this->assertEquals("", $m->serializeToString());
+    }
+
+    public function testJsonDecodeMapWithDefaultValueKey()
+    {
+        $m = new TestMessage();
+        $m->getMapInt32Int32()[0] = 0;
+        $this->assertSame("{\"mapInt32Int32\":{\"0\":0}}",
+                          $m->serializeToJsonString());
+
+        $m = new TestMessage();
+        $m->getMapStringString()[""] = "";
+        $this->assertSame("{\"mapStringString\":{\"\":\"\"}}",
+                          $m->serializeToJsonString());
+    }
+
+    public function testJsonDecodeNumericStringMapKey()
+    {
+        $m = new TestMessage();
+        $m->getMapStringString()["1"] = "1";
+        $data = $m->serializeToJsonString();
+        $this->assertSame("{\"mapStringString\":{\"1\":\"1\"}}", $data);
+        $n = new TestMessage();
+        $n->mergeFromJsonString($data);
     }
 
 }
