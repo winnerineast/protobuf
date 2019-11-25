@@ -38,7 +38,7 @@ using System.Linq;
 namespace Google.Protobuf
 {
     /// <summary>
-    /// Provides extensions to messages while parsing
+    /// Provides extensions to messages while parsing. This API is experimental and subject to change.
     /// </summary>
     public sealed class ExtensionRegistry : ICollection<Extension>, IDeepCloneable<ExtensionRegistry>
     {
@@ -83,24 +83,16 @@ namespace Google.Protobuf
         }
 
         /// <summary>
-        /// Adds the specified extensions to the registry
-        /// </summary>
-        public void Add(params Extension[] newExtensions)
-        {
-            ProtoPreconditions.CheckNotNull(newExtensions, nameof(newExtensions));
-
-            Add((IEnumerable<Extension>)newExtensions);
-        }
-
-        /// <summary>
         /// Adds the specified extensions to the reigstry
         /// </summary>
-        public void Add(IEnumerable<Extension> newExtensions)
+        public void AddRange(IEnumerable<Extension> extensions)
         {
-            ProtoPreconditions.CheckNotNull(newExtensions, nameof(newExtensions));
+            ProtoPreconditions.CheckNotNull(extensions, nameof(extensions));
 
-            foreach (var extension in newExtensions)
+            foreach (var extension in extensions)
+            {
                 Add(extension);
+            }
         }
 
         /// <summary>
@@ -130,9 +122,13 @@ namespace Google.Protobuf
         {
             ProtoPreconditions.CheckNotNull(array, nameof(array));
             if (arrayIndex < 0 || arrayIndex >= array.Length)
+            {
                 throw new ArgumentOutOfRangeException(nameof(arrayIndex));
+            }
             if (array.Length - arrayIndex < Count)
+            {
                 throw new ArgumentException("The provided array is shorter than the number of elements in the registry");
+            }
 
             for (int i = 0; i < array.Length; i++)
             {
